@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTicketStore, useAdminStore, useSessionStore } from '../store';
 import { Ticket, TicketStatus, User, Role, ErrorType, AutomatedMessage, AuditLog } from '../types';
@@ -14,6 +15,7 @@ const AdminTicketDashboard: React.FC = () => {
     const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
     const [copiedUid, setCopiedUid] = useState<string | null>(null);
+    const [adminComment, setAdminComment] = useState('');
 
     useEffect(() => {
         fetchTickets();
@@ -23,6 +25,7 @@ const AdminTicketDashboard: React.FC = () => {
 
     const handleOpenTicketModal = (ticket: Ticket) => {
         setSelectedTicket({ ...ticket });
+        setAdminComment('');
         setIsTicketModalOpen(true);
     };
 
@@ -41,10 +44,22 @@ const AdminTicketDashboard: React.FC = () => {
 
     const handleUpdateTicket = async () => {
         if (!selectedTicket) return;
+        
+        const trimmedNewComment = adminComment.trim();
+        let finalComment = selectedTicket.comment || '';
+
+        if (trimmedNewComment) {
+            if (finalComment) {
+                finalComment += `\n---\n${trimmedNewComment}`;
+            } else {
+                finalComment = trimmedNewComment;
+            }
+        }
+
         await updateTicket({
             id: selectedTicket.id,
             status: selectedTicket.status,
-            comment: selectedTicket.comment,
+            comment: finalComment,
         });
         setIsTicketModalOpen(false);
         setSelectedTicket(null);
@@ -154,6 +169,12 @@ const AdminTicketDashboard: React.FC = () => {
                             <Label>Description</Label>
                             <p className="text-sm text-slate-600 p-2 bg-slate-50 rounded-md mt-1">{selectedTicket.description}</p>
                         </div>
+                        {selectedTicket.comment && (
+                            <div>
+                                <Label>Current DataCR Comments</Label>
+                                <div className="text-sm text-slate-600 p-2 bg-slate-50 rounded-md mt-1 max-h-32 overflow-y-auto whitespace-pre-wrap">{selectedTicket.comment}</div>
+                            </div>
+                        )}
                         <div>
                             <Label htmlFor="ticket-status">Status</Label>
                             <Select id="ticket-status" value={selectedTicket.status} onChange={e => setSelectedTicket({...selectedTicket, status: e.target.value as TicketStatus})}>
@@ -164,7 +185,7 @@ const AdminTicketDashboard: React.FC = () => {
                         </div>
                         <div>
                             <Label htmlFor="ticket-comment">Admin Comment / Solution</Label>
-                            <Textarea id="ticket-comment" value={selectedTicket.comment || ''} onChange={e => setSelectedTicket({...selectedTicket, comment: e.target.value})} placeholder="Add a comment..."/>
+                            <Textarea id="ticket-comment" value={adminComment} onChange={e => setAdminComment(e.target.value)} placeholder="Add a new comment or solution details..."/>
                         </div>
                         <div className="flex justify-end gap-2"><Button variant="secondary" onClick={() => setIsTicketModalOpen(false)}>Cancel</Button><Button onClick={handleUpdateTicket}>Update Ticket</Button></div>
                     </div>
