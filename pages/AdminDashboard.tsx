@@ -280,10 +280,10 @@ const ErrorAnalytics: React.FC = () => {
 
 // Sub-component for PRE management
 const PreManagement: React.FC = () => {
-    const { users, addUser, deleteUser, fetchAdminData } = useAdminStore();
+    const { users, addUser, updateUser, deleteUser, fetchAdminData } = useAdminStore();
     const { user: currentUser } = useSessionStore();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newUser, setNewUser] = useState<Omit<User, 'id'>>({ name: '', email: '', role: Role.PRE });
+    const [userFormData, setUserFormData] = useState<Omit<User, 'id'> & { id?: string }>({ name: '', email: '', role: Role.PRE });
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
     
@@ -293,16 +293,25 @@ const PreManagement: React.FC = () => {
     }, []);
 
     const handleAddModalOpen = () => {
-        setNewUser({ name: '', email: '', role: Role.PRE });
+        setUserFormData({ name: '', email: '', role: Role.PRE });
+        setIsModalOpen(true);
+    };
+
+    const handleEditModalOpen = (user: User) => {
+        setUserFormData(user);
         setIsModalOpen(true);
     };
 
     const handleSaveUser = async () => {
-        if (!newUser.name || !newUser.email) {
+        if (!userFormData.name || !userFormData.email) {
             alert('Name and email are required.');
             return;
         }
-        await addUser(newUser);
+        if (userFormData.id) {
+            await updateUser(userFormData as User);
+        } else {
+            await addUser(userFormData as Omit<User, 'id'>);
+        }
         setIsModalOpen(false);
     };
     
@@ -342,7 +351,7 @@ const PreManagement: React.FC = () => {
                                 <TableCell className="space-x-2">
                                     {currentUser?.role === Role.ADMIN && (
                                     <>
-                                        <Button variant="secondary" size="sm" className="px-2 py-1 h-auto"><span className="text-slate-600">{ICONS.edit}</span></Button>
+                                        <Button onClick={() => handleEditModalOpen(user)} variant="secondary" size="sm" className="px-2 py-1 h-auto"><span className="text-slate-600">{ICONS.edit}</span></Button>
                                         <Button onClick={() => handleDeleteRequest(user)} variant="danger" size="sm" className="px-2 py-1 h-auto"><span className="text-white">{ICONS.delete}</span></Button>
                                     </>
                                     )}
@@ -354,11 +363,18 @@ const PreManagement: React.FC = () => {
             </CardContent>
         </Card>
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-            <h3 className="text-lg font-medium mb-4">Add New PRE</h3>
+            <h3 className="text-lg font-medium mb-4">{userFormData.id ? 'Edit User' : 'Add New User'}</h3>
             <div className="space-y-4">
-                <div><Label htmlFor="pre-name">Name</Label><Input id="pre-name" value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} /></div>
-                <div><Label htmlFor="pre-email">Email</Label><Input id="pre-email" type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} /></div>
-                <div className="flex justify-end gap-2"><Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancel</Button><Button onClick={handleSaveUser}>Save PRE</Button></div>
+                <div><Label htmlFor="user-name">Name</Label><Input id="user-name" value={userFormData.name} onChange={e => setUserFormData({...userFormData, name: e.target.value})} /></div>
+                <div><Label htmlFor="user-email">Email</Label><Input id="user-email" type="email" value={userFormData.email} onChange={e => setUserFormData({...userFormData, email: e.target.value})} /></div>
+                <div>
+                    <Label htmlFor="user-role">Role</Label>
+                    <Select id="user-role" value={userFormData.role} onChange={e => setUserFormData({...userFormData, role: e.target.value as Role})}>
+                        <option value={Role.PRE}>PRE</option>
+                        <option value={Role.DATACR}>DataCR</option>
+                    </Select>
+                </div>
+                <div className="flex justify-end gap-2"><Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancel</Button><Button onClick={handleSaveUser}>Save User</Button></div>
             </div>
         </Modal>
         <Modal isOpen={isConfirmModalOpen} onClose={() => setIsConfirmModalOpen(false)}>
