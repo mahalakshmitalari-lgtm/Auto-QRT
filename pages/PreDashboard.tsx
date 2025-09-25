@@ -107,7 +107,7 @@ const TicketTable: React.FC<{ tickets: Ticket[], errorTypes: ErrorType[] }> = ({
                                 <TableCell>{getErrorTypeName(ticket.errorTypeId)}</TableCell>
                                 <TableCell><StatusBadge status={ticket.status} /></TableCell>
                                 <TableCell className="text-sm text-slate-600 max-w-xs truncate" title={ticket.comment}>{ticket.comment || '–'}</TableCell>
-                                <TableCell>{new Date(ticket.updatedAt).toLocaleDateString()}</TableCell>
+                                <TableCell>{new Date(ticket.updatedAt).toLocaleString()}</TableCell>
                             </TableRow>
                         )) : (
                             <TableRow>
