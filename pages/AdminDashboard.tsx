@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTicketStore, useAdminStore, useSessionStore } from '../store';
 import { Ticket, TicketStatus, User, Role, ErrorType, AutomatedMessage, AuditLog } from '../types';
@@ -132,7 +131,7 @@ const AdminTicketDashboard: React.FC = () => {
                                             <Button variant="secondary" size="sm" className="px-2 py-1 h-auto" onClick={() => handleOpenTicketModal(ticket)}>
                                                 <span className="text-slate-600">{ICONS.edit}</span>
                                             </Button>
-                                            {(user?.role === Role.ADMIN || user?.role === Role.DATACR) && ticket.status === TicketStatus.ESCALATED && (
+                                            {(user?.role === Role.ADMIN || user?.role === Role.DATACR) && (ticket.status === TicketStatus.ESCALATED || ticket.status === TicketStatus.AWAITING_NBFC) && (
                                                 <Button size="sm" onClick={() => handleSolveTicket(ticket.id)}>
                                                     Solved
                                                 </Button>
