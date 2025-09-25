@@ -1,4 +1,6 @@
+
 import React from 'react';
+import { TicketStatus } from '../types';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'danger';
@@ -111,7 +113,7 @@ export const TableCell: React.FC<React.TdHTMLAttributes<HTMLTableCellElement>> =
 
 
 type BadgeProps = React.HTMLAttributes<HTMLDivElement> & {
-    variant?: 'default' | 'success' | 'warning' | 'danger';
+    variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
 };
 export const Badge: React.FC<BadgeProps> = ({ className, variant = 'default', ...props }) => {
     const variants = {
@@ -119,6 +121,7 @@ export const Badge: React.FC<BadgeProps> = ({ className, variant = 'default', ..
         success: 'border-transparent bg-green-100 text-green-800',
         warning: 'border-transparent bg-yellow-100 text-yellow-800',
         danger: 'border-transparent bg-red-100 text-red-800',
+        info: 'border-transparent bg-indigo-100 text-indigo-800',
     };
     return (
         <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors ${variants[variant]} ${className}`} {...props} />
@@ -154,3 +157,14 @@ const customStyles = `
   }
 `;
 export const GlobalStyles = () => <style>{customStyles}</style>;
+
+export const StatusBadge: React.FC<{ status: TicketStatus }> = ({ status }) => {
+    const variantMap: { [key in TicketStatus]: Exclude<BadgeProps['variant'], undefined> } = {
+        [TicketStatus.COMPLETED]: 'success',
+        [TicketStatus.IN_PROGRESS]: 'warning',
+        [TicketStatus.ESCALATED]: 'danger',
+        [TicketStatus.CLOSED]: 'default',
+        [TicketStatus.AWAITING_NBFC]: 'info',
+    };
+    return <Badge variant={variantMap[status]}>{status}</Badge>;
+};

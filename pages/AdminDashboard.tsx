@@ -1,18 +1,9 @@
+
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTicketStore, useAdminStore, useSessionStore } from '../store';
 import { Ticket, TicketStatus, User, Role, ErrorType, AutomatedMessage, AuditLog } from '../types';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, Select, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge, Modal, Textarea } from '../components/ui';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, Select, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge, Modal, Textarea, StatusBadge } from '../components/ui';
 import { ICONS } from '../constants';
-
-const StatusBadge: React.FC<{ status: TicketStatus }> = ({ status }) => {
-    const variant = {
-        [TicketStatus.COMPLETED]: 'success',
-        [TicketStatus.IN_PROGRESS]: 'warning',
-        [TicketStatus.ESCALATED]: 'danger',
-        [TicketStatus.CLOSED]: 'default',
-    }[status] as 'success' | 'warning' | 'danger' | 'default';
-    return <Badge variant={variant}>{status}</Badge>;
-};
 
 // Sub-component for main ticket dashboard
 const AdminTicketDashboard: React.FC = () => {
@@ -81,7 +72,7 @@ const AdminTicketDashboard: React.FC = () => {
         errorName: errorTypes.find(et => et.id === ticket.errorTypeId)?.name || 'Unknown Error'
     });
 
-    const tabs: (TicketStatus | 'All')[] = ['All', TicketStatus.IN_PROGRESS, TicketStatus.ESCALATED, TicketStatus.COMPLETED, TicketStatus.CLOSED];
+    const tabs: (TicketStatus | 'All')[] = ['All', TicketStatus.IN_PROGRESS, TicketStatus.ESCALATED, TicketStatus.AWAITING_NBFC, TicketStatus.COMPLETED, TicketStatus.CLOSED];
 
     return (
         <>

@@ -93,6 +93,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       id: `ticket-${Date.now()}`,
       preId,
       status: status,
+      // Fix: Corrected typo 'aite' to 'Date'.
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -163,6 +164,19 @@ export const useTicketStore = create<TicketState>((set, get) => ({
                 isRead: false,
             };
             mockAdminNotifications.unshift(newAdminNotification);
+        }
+
+        if (updatedTicket.status === TicketStatus.AWAITING_NBFC && originalStatus !== TicketStatus.AWAITING_NBFC) {
+            const newNotification: SystemNotification = {
+                id: `notif-${Date.now()}`,
+                ticketId: updatedTicket.id,
+                preId: updatedTicket.preId,
+                uid: updatedTicket.uid,
+                message: `Your ticket for UID ${updatedTicket.uid} has been forwarded to the NBFC support team. DataCR Comment: "${updatedTicket.comment || 'No comment provided.'}"`,
+                timestamp: new Date().toISOString(),
+                isRead: false,
+            };
+            mockNotifications.unshift(newNotification);
         }
 
         if (

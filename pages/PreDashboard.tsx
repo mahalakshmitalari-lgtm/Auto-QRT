@@ -2,18 +2,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTicketStore, useSessionStore, useAdminStore } from '../store';
 import { Ticket, TicketStatus, ErrorType, SystemNotification } from '../types';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, Select, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea, Badge } from '../components/ui';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, Select, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea, StatusBadge } from '../components/ui';
 import { ICONS } from '../constants';
-
-const StatusBadge: React.FC<{ status: TicketStatus }> = ({ status }) => {
-    const variant = {
-        [TicketStatus.COMPLETED]: 'success',
-        [TicketStatus.IN_PROGRESS]: 'warning',
-        [TicketStatus.ESCALATED]: 'danger',
-        [TicketStatus.CLOSED]: 'default',
-    }[status] as 'success' | 'warning' | 'danger' | 'default';
-    return <Badge variant={variant}>{status}</Badge>;
-};
 
 const TicketForm: React.FC<{ errorTypes: ErrorType[], onSubmit: () => void }> = ({ errorTypes, onSubmit }) => {
     const { addTicket } = useTicketStore();

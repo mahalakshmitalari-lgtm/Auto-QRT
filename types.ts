@@ -9,7 +9,8 @@ export enum TicketStatus {
   IN_PROGRESS = 'In Progress',
   COMPLETED = 'Completed',
   ESCALATED = 'Escalated',
-  CLOSED = 'Closed'
+  CLOSED = 'Closed',
+  AWAITING_NBFC = 'Awaiting NBFC Response'
 }
 
 export enum Team {
