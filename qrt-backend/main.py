@@ -152,6 +152,41 @@ def add_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
         
+@app.route('/api/users', methods=['GET'])
+@admin_required
+def list_users():
+    try:
+        # Start listing users from the beginning.
+        page = auth.list_users()
+        users = []
+        while page:
+            for user in page.users:
+                users.append({
+                    'uid': user.uid,
+                    'email': user.email,
+                    'displayName': user.display_name,
+                    'custom_claims': user.custom_claims
+                })
+            # Get next page
+            page = page.get_next_page()
+
+        return jsonify(users), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/users/make-admin', methods=['POST'])
+@admin_required
+def make_admin():
+    email = request.json.get('email')
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+    try:
+        user = auth.get_user_by_email(email)
+        auth.set_custom_user_claims(user.uid, {'role': 'ADMIN'})
+        return jsonify({'message': f'Successfully made {email} an admin.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 ## NSDL Proxy Endpoint
 @app.route('/api/nsdl/fetch-name', methods=['POST'])
 def fetch_nsdl_name():
